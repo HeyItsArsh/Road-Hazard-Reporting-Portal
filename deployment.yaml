@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: road-hazard-portal
-          image: YOUR_DOCKERHUB_USERNAME/road-hazard-portal:stable
+          image: HeyItsArsh/road-hazard-portal:stable
           ports:
             - containerPort: 80
           readinessProbe:
