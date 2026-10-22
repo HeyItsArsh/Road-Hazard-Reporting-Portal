@@ -23,6 +23,24 @@
             margin: 30px;
         }
 
+        .summary {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background-color: white;
+            padding: 15px;
+            border: 1px solid #ccc;
+            flex: 1;
+        }
+
+        select {
+            padding: 8px;
+            margin-bottom: 15px;
+        }
+
         table {
             width: 100%;
             background-color: white;
@@ -45,11 +63,44 @@
 
     <header>
         <h1>Road Hazard Reporting Portal</h1>
-        <p>Road Complaints and Repair Status</p>
+        <p>Track road complaints and repair progress</p>
     </header>
 
     <main>
+        <h2>Complaint Summary</h2>
+
+        <div class="summary">
+            <div class="card">
+                <h3>Total Complaints</h3>
+                <p id="total">0</p>
+            </div>
+
+            <div class="card">
+                <h3>Pending</h3>
+                <p id="pending">0</p>
+            </div>
+
+            <div class="card">
+                <h3>In Progress</h3>
+                <p id="progress">0</p>
+            </div>
+
+            <div class="card">
+                <h3>Resolved</h3>
+                <p id="resolved">0</p>
+            </div>
+        </div>
+
         <h2>Reported Road Hazards</h2>
+
+        <label for="categoryFilter">Filter by category:</label>
+
+        <select id="categoryFilter">
+            <option value="All">All Categories</option>
+            <option value="Pothole">Potholes</option>
+            <option value="Damaged Streetlight">Damaged Streetlights</option>
+            <option value="Waterlogging">Waterlogging</option>
+        </select>
 
         <table>
             <thead>
@@ -64,30 +115,54 @@
 
             <tbody id="complaints"></tbody>
         </table>
+
+        <p id="resultCount"></p>
     </main>
 
     <script>
         const complaints = [
-            ["RH001", "Pothole", "Lucknow Chowk, Main Road", "10-10-2026", "Pending"],
-            ["RH002", "Damaged Streetlight", "Alambagh Chauraha", "05-11-2026", "In Progress"],
-            ["RH003", "Waterlogging", "Vasant Kunj, Sarojini Nagar", "10-12-2026", "Resolved"],
-            ["RH004", "Pothole", "Ameenabad", "03-09-2026", "In Progress"],
-            ["RH005", "Damaged Streetlight", "Hydle Colony", "22-10-2026", "Pending"]
+            {id: "RH001", category: "Pothole", location: "Lucknow Chowk, Main Road", date: "10-10-2026", status: "Pending"},
+            {id: "RH002", category: "Damaged Streetlight", location: "Alambagh Chauraha", date: "05-11-2026", status: "In Progress"},
+            {id: "RH003", category: "Waterlogging", location: "Vasant Kunj, Sarojini Nagar", date: "10-12-2026", status: "Resolved"},
+            {id: "RH004", category: "Pothole", location: "Ameenabad", date: "03-09-2026", status: "In Progress"},
+            {id: "RH005", category: "Damaged Streetlight", location: "Hydle Colony", date: "22-10-2026", status: "Pending"}
         ];
 
-        const table = document.getElementById("complaints");
+        document.getElementById("total").textContent = complaints.length;
+        document.getElementById("pending").textContent =
+            complaints.filter(c => c.status === "Pending").length;
+        document.getElementById("progress").textContent =
+            complaints.filter(c => c.status === "In Progress").length;
+        document.getElementById("resolved").textContent =
+            complaints.filter(c => c.status === "Resolved").length;
 
-        complaints.forEach(function(c) {
-            table.innerHTML += `
-                <tr>
-                    <td>${c[0]}</td>
-                    <td>${c[1]}</td>
-                    <td>${c[2]}</td>
-                    <td>${c[3]}</td>
-                    <td>${c[4]}</td>
-                </tr>
-            `;
-        });
+        function showComplaints() {
+            const category = document.getElementById("categoryFilter").value;
+
+            const filtered = complaints.filter(c =>
+                category === "All" || c.category === category
+            );
+
+            document.getElementById("complaints").innerHTML =
+                filtered.map(c => `
+                    <tr>
+                        <td>${c.id}</td>
+                        <td>${c.category}</td>
+                        <td>${c.location}</td>
+                        <td>${c.date}</td>
+                        <td>${c.status}</td>
+                    </tr>
+                `).join("");
+
+            document.getElementById("resultCount").textContent =
+                "Showing " + filtered.length + " of " +
+                complaints.length + " complaints.";
+        }
+
+        document.getElementById("categoryFilter")
+            .addEventListener("change", showComplaints);
+
+        showComplaints();
     </script>
 
 </body>
